@@ -12,6 +12,7 @@ import Listing from './pages/Listing';
 import Search from './pages/Search';
 import Layout from './components/shared/Layout';
 import Stats from './components/Stats';
+import ListingScreen from './pages/ListingScreen';
 
 export default function App() {
 
@@ -32,6 +33,7 @@ export default function App() {
         <Route element={<PrivateRoute />}>
           <Route path="/dashboard" element={<Layout />}>
             <Route path='statistics' element={<Stats />} />
+            <Route path='all-listings' element={<ListingScreen />} />
             <Route path='profile' element={<Profile />} />
             <Route path='create-listing' element={<CreateListing />} />
             <Route path='update-listing/:listingId' element={<UpdateListing />} />
