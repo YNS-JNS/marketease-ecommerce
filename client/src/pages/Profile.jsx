@@ -1,4 +1,4 @@
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useRef, useState, useEffect } from 'react';
 import {
   getDownloadURL,
@@ -14,9 +14,9 @@ import {
   deleteUserFailure,
   deleteUserStart,
   deleteUserSuccess,
-  signOutUserStart,
+  // signOutUserStart,
 } from '../redux/user/userSlice';
-import { useDispatch } from 'react-redux';
+// import { useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 export default function Profile() {
   const fileRef = useRef(null);
@@ -111,55 +111,56 @@ export default function Profile() {
     }
   };
 
-  const handleSignOut = async () => {
-    try {
-      dispatch(signOutUserStart());
-      const res = await fetch('/api/auth/signout');
-      const data = await res.json();
-      if (data.success === false) {
-        dispatch(deleteUserFailure(data.message));
-        return;
-      }
-      dispatch(deleteUserSuccess(data));
-    } catch (error) {
-      dispatch(deleteUserFailure(data.message));
-    }
-  };
+  // const handleSignOut = async () => {
+  //   try {
+  //     dispatch(signOutUserStart());
+  //     const res = await fetch('/api/auth/signout');
+  //     const data = await res.json();
+  //     if (data.success === false) {
+  //       dispatch(deleteUserFailure(data.message));
+  //       return;
+  //     }
+  //     dispatch(deleteUserSuccess(data));
+  //   } catch (error) {
+  //     dispatch(deleteUserFailure(data.message));
+  //   }
+  // };
 
-  const handleShowListings = async () => {
-    try {
-      setShowListingsError(false);
-      const res = await fetch(`/api/user/listings/${currentUser._id}`);
-      const data = await res.json();
-      if (data.success === false) {
-        setShowListingsError(true);
-        return;
-      }
+  // const handleShowListings = async () => {
+  //   try {
+  //     setShowListingsError(false);
+  //     const res = await fetch(`/api/user/listings/${currentUser._id}`);
+  //     const data = await res.json();
+  //     if (data.success === false) {
+  //       setShowListingsError(true);
+  //       return;
+  //     }
 
-      setUserListings(data);
-    } catch (error) {
-      setShowListingsError(true);
-    }
-  };
+  //     setUserListings(data);
+  //   } catch (error) {
+  //     setShowListingsError(true);
+  //   }
+  // };
 
-  const handleListingDelete = async (listingId) => {
-    try {
-      const res = await fetch(`/api/listing/delete/${listingId}`, {
-        method: 'DELETE',
-      });
-      const data = await res.json();
-      if (data.success === false) {
-        console.log(data.message);
-        return;
-      }
+  // const handleListingDelete = async (listingId) => {
+  //   try {
+  //     const res = await fetch(`/api/listing/delete/${listingId}`, {
+  //       method: 'DELETE',
+  //     });
+  //     const data = await res.json();
+  //     if (data.success === false) {
+  //       console.log(data.message);
+  //       return;
+  //     }
 
-      setUserListings((prev) =>
-        prev.filter((listing) => listing._id !== listingId)
-      );
-    } catch (error) {
-      console.log(error.message);
-    }
-  };
+  //     setUserListings((prev) =>
+  //       prev.filter((listing) => listing._id !== listingId)
+  //     );
+  //   } catch (error) {
+  //     console.log(error.message);
+  //   }
+  // };
+
   return (
     <div className='p-3 max-w-lg mx-auto'>
       <h1 className='text-3xl font-semibold text-center my-7'>Profile</h1>
@@ -213,43 +214,53 @@ export default function Profile() {
           id='password'
           className='border p-3 rounded-lg'
         />
+        {/* Update button  */}
         <button
           disabled={loading}
           className='bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80'
         >
           {loading ? 'Loading...' : 'Update'}
         </button>
-        <Link
+        {/* Delete button  */}
+        <button
+          onClick={handleDeleteUser}
+          className='bg-red-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80'
+        >
+          {loading ? 'Loading...' : 'Delete account'}
+        </button>
+        {/* <Link
           className='bg-green-700 text-white p-3 rounded-lg uppercase text-center hover:opacity-95'
           to={'/create-listing'}
         >
           Create Listing
-        </Link>
+        </Link> */}
       </form>
-      <div className='flex justify-between mt-5'>
-        <span
+      {/* <div className='flex justify-between mt-5'> */}
+        {/* <span
           onClick={handleDeleteUser}
           className='text-red-700 cursor-pointer'
         >
           Delete account
-        </span>
-        <span onClick={handleSignOut} className='text-red-700 cursor-pointer'>
+        </span> */}
+        {/* <span onClick={handleSignOut} className='text-red-700 cursor-pointer'>
           Sign out
         </span>
-      </div>
+      </div> */}
 
       <p className='text-red-700 mt-5'>{error ? error : ''}</p>
       <p className='text-green-700 mt-5'>
         {updateSuccess ? 'User is updated successfully!' : ''}
       </p>
-      <button onClick={handleShowListings} className='text-green-700 w-full'>
+
+      {/* Show listing  */}
+      {/* <button onClick={handleShowListings} className='text-green-700 w-full'>
         Show Listings
       </button>
       <p className='text-red-700 mt-5'>
         {showListingsError ? 'Error showing listings' : ''}
-      </p>
+      </p> */}
 
-      {userListings && userListings.length > 0 && (
+      {/* {userListings && userListings.length > 0 && (
         <div className='flex flex-col gap-4'>
           <h1 className='text-center mt-7 text-2xl font-semibold'>
             Your Listings
@@ -280,14 +291,14 @@ export default function Profile() {
                 >
                   Delete
                 </button>
-                <Link to={`/update-listing/${listing._id}`}>
+                <Link to={`/dashboard/update-listing/${listing._id}`}>
                   <button className='text-green-700 uppercase'>Edit</button>
                 </Link>
               </div>
             </div>
           ))}
         </div>
-      )}
+      )} */}
     </div>
   );
 }
