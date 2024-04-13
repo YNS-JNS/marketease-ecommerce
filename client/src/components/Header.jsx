@@ -1,10 +1,31 @@
 import { FaSearch } from 'react-icons/fa';
-import { Link, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { useEffect, useState } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect, useRef, useState } from 'react';
+import { signOutUserStart, deleteUserFailure, deleteUserSuccess } from '../redux/user/userSlice';
+
 
 export default function Header() {
   const { currentUser } = useSelector((state) => state.user);
+  const location = useLocation();
+
+  const [profileOpen, setProfileOpen] = useState(false);
+  const profileRef = useRef(null);
+
+  useEffect(() => {
+    const handleOutsideClick = (event) => {
+      if (profileRef.current && !profileRef.current.contains(event.target)) {
+        setProfileOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleOutsideClick);
+
+    return () => {
+      document.removeEventListener('mousedown', handleOutsideClick);
+    };
+  }, []);
+
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
   const handleSubmit = (e) => {
@@ -22,6 +43,27 @@ export default function Header() {
       setSearchTerm(searchTermFromUrl);
     }
   }, [location.search]);
+
+  const dispatch = useDispatch();
+
+  const handleSignOut = async () => {
+    try {
+      dispatch(signOutUserStart());
+      const res = await fetch('/api/auth/signout');
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(deleteUserFailure(data.message));
+        return;
+      }
+      dispatch(deleteUserSuccess(data));
+    } catch (error) {
+      // dispatch(deleteUserFailure(data.message));
+      dispatch(deleteUserFailure(error.message));
+    } finally {
+      window.location.reload();
+    }
+  };
+
   return (
     <header className='bg-slate-200 shadow-md'>
       <div className='flex justify-between items-center max-w-6xl mx-auto p-3'>
@@ -46,7 +88,7 @@ export default function Header() {
             <FaSearch className='text-slate-600' />
           </button>
         </form>
-        <ul className='flex gap-4'>
+        <ul className='flex gap-4 items-center justify-between'>
           <Link to='/'>
             <li className='hidden sm:inline text-slate-700 hover:underline'>
               Home
@@ -57,18 +99,73 @@ export default function Header() {
               About
             </li>
           </Link>
-          <Link to='/dashboard/profile'>
-            {currentUser ? (
+          {/*  ____________________ Button to show dropdown profile ____________________   */}
+          {currentUser ? (
+            <div ref={profileRef}>
+              <button
+                type="button"
+                onClick={() => setProfileOpen(!profileOpen)}
+                className="h-9 w-9 overflow-hidden rounded-full"
+              >
+                <img
+                  className='rounded-full h-7 w-7 object-cover'
+                  src={currentUser.avatar}
+                  alt='profile'
+                />
+              </button>
+            </div>
+          ) : (
+            <Link to={'/sign-in'}>
+              <li className=' text-slate-700 hover:underline'> Sign in</li>
+            </Link>
+          )}
+        </ul>
+        {/*  ____________________ dropdown profile ____________________   */}
+        {profileOpen && (
+          <div className="absolute right-8 mt-64 w-48 divide-y divide-gray-200 rounded-md border border-gray-200 bg-white shadow-md" ref={profileRef}>
+            <div className="flex items-center space-x-2 p-2">
               <img
                 className='rounded-full h-7 w-7 object-cover'
                 src={currentUser.avatar}
                 alt='profile'
               />
-            ) : (
-              <li className=' text-slate-700 hover:underline'> Sign in</li>
-            )}
-          </Link>
-        </ul>
+              <div className="font-medium"> {currentUser.username} </div>
+            </div>
+
+            <div className="flex flex-col space-y-3 p-2">
+              <Link to={'/dashboard/profile'} className="transition hover:text-blue-600">
+                My Profile
+              </Link>
+              <Link to={'/dashboard/statistics'} className="transition hover:text-blue-600">
+                Dashboard
+              </Link>
+            </div>
+
+            <div className="p-2">
+              <Link to={'/sign-in'}>
+                <button
+                  onClick={handleSignOut}
+                  className="flex items-center space-x-2 transition hover:text-blue-600">
+                  <svg
+                    className="h-4 w-4"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth="2"
+                      d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"
+                    ></path>
+                  </svg>
+                  <div>Sign Out</div>
+                </button>
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
     </header>
   );
