@@ -36,6 +36,10 @@ app.use('/api/listing', listingRouter);
 
 app.use(express.static(path.join(__dirname, '/client/dist')));
 
+/*
+This code snippet defines a route that matches any path and sends 
+the index.html file from the client/dist directory as the response.
+*/
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'client', 'dist', 'index.html'));
 })
