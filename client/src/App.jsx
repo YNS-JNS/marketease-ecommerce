@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Routes, Route, useLocation } from 'react-router-dom';
 import Home from './pages/Home';
 import SignIn from './pages/SignIn';
 import SignUp from './pages/SignUp';
@@ -10,11 +10,18 @@ import CreateListing from './pages/CreateListing';
 import UpdateListing from './pages/UpdateListing';
 import Listing from './pages/Listing';
 import Search from './pages/Search';
+import Layout from './components/shared/Layout';
+import Stats from './components/Stats';
+import ListingScreen from './pages/ListingScreen';
 
 export default function App() {
+
+  const location = useLocation();
+  const hideHeader = location.pathname.startsWith('/dashboard');
+
   return (
-    <BrowserRouter>
-      <Header />
+    <>
+      {!hideHeader && <Header />}
       <Routes>
         <Route path='/' element={<Home />} />
         <Route path='/sign-in' element={<SignIn />} />
@@ -24,14 +31,17 @@ export default function App() {
         <Route path='/listing/:listingId' element={<Listing />} />
 
         <Route element={<PrivateRoute />}>
-          <Route path='/profile' element={<Profile />} />
-          <Route path='/create-listing' element={<CreateListing />} />
-          <Route
-            path='/update-listing/:listingId'
-            element={<UpdateListing />}
-          />
+          <Route path="/dashboard" element={<Layout />}>
+            <Route path='statistics' element={<Stats />} />
+            <Route path='all-listings' element={<ListingScreen />} />
+            <Route path='profile' element={<Profile />} />
+            <Route path='create-listing' element={<CreateListing />} />
+            <Route path='update-listing/:listingId' element={<UpdateListing />} />
+          </Route>
         </Route>
+
       </Routes>
-    </BrowserRouter>
+    </>
+
   );
 }
