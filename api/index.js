@@ -97,3 +97,6 @@ app.use((err, req, res, next) => {
     message, // Send the error message
   });
 });
+
+// Note: that you have to export app
+// export default app;
