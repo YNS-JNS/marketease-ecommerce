@@ -6,6 +6,7 @@ import authRouter from './routes/auth.route.js';
 import listingRouter from './routes/listing.route.js';
 import cookieParser from 'cookie-parser';
 import path from 'path';
+import cors from 'cors'
 dotenv.config();
 
 const port = process.env.PORT || 3000;
@@ -31,6 +32,11 @@ app.use(express.json());
  * It adds the parsed cookies to the request object.
 */
 app.use(cookieParser());
+
+app.use(cors({
+  credentials : true,
+  origin : "*",
+}))
 
 app.listen(port, () => {
   console.log(`Server is running 🚀 on port localhost: ${port} ^_^`);
