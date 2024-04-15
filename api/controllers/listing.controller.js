@@ -1,6 +1,12 @@
 import Listing from '../models/listing.model.js';
 import { errorHandler } from '../utils/error.js';
 
+/**
+ * @desc Creates a new listing.
+ * @param req The request object, containing the body of the listing to create.
+ * @param res The response object, used to send the result of the creation.
+ * @returns {Promise<void>} A promise that resolves when the product is created, or rejects with an error message.
+*/
 export const createListing = async (req, res, next) => {
   try {
     const listing = await Listing.create(req.body);
@@ -10,6 +16,13 @@ export const createListing = async (req, res, next) => {
   }
 };
 
+/**
+ * @desc Delete a listing by its id.
+ * @param {Object} req - The request object, containing the id of the listing to delete.
+ * @param {Object} res - The response object, used to send the result of the deletion.
+ * @param {Function} next - The next middleware function.
+ * @returns {Promise<void>} - A promise that resolves when the listing is deleted, or rejects with an error message.
+*/
 export const deleteListing = async (req, res, next) => {
   const listing = await Listing.findById(req.params.id);
 
@@ -29,6 +42,13 @@ export const deleteListing = async (req, res, next) => {
   }
 };
 
+/**
+ * @desc Updates a listing by its id.
+ * @param {Object} req - The request object, containing the id of the listing to update and the new data.
+ * @param {Object} res - The response object, used to send the result of the update.
+ * @param {Function} next - The next middleware function.
+ * @returns {Promise<void>} - A promise that resolves when the listing is updated, or rejects with an error message.
+*/
 export const updateListing = async (req, res, next) => {
   const listing = await Listing.findById(req.params.id);
   if (!listing) {
@@ -50,6 +70,13 @@ export const updateListing = async (req, res, next) => {
   }
 };
 
+/**
+ * @desc Retrieves a listing by its id.
+ * @param {Object} req - The request object, containing the id of the listing to retrieve.
+ * @param {Object} res - The response object, used to send the result of the retrieval.
+ * @param {Function} next - The next middleware function.
+ * @returns {Promise<void>} - A promise that resolves when the listing is retrieved, or rejects with an error message.
+*/
 export const getListing = async (req, res, next) => {
   try {
     const listing = await Listing.findById(req.params.id);
@@ -62,6 +89,13 @@ export const getListing = async (req, res, next) => {
   }
 };
 
+/**
+ * @desc Retrieves listings based on query parameters.
+ * @param {Object} req - The request object, containing query parameters.
+ * @param {Object} res - The response object, used to send the result of the retrieval.
+ * @param {Function} next - The next middleware function.
+ * @returns {Promise<void>} - A promise that resolves when the listings are retrieved, or rejects with an error message.
+*/
 export const getListings = async (req, res, next) => {
   try {
     const limit = parseInt(req.query.limit) || 9;
@@ -112,3 +146,14 @@ export const getListings = async (req, res, next) => {
     next(error);
   }
 };
+
+// export const getListings = async (req, res, next) => {
+//   try {
+//     const listings = await Listing.find({})
+
+//     return res.status(200).json(listings);
+//   } catch (error) {
+//     // res.status(500).json({ error: error.message });
+//     next(error);
+//   }
+// };
