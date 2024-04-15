@@ -17,3 +17,10 @@ ReactDOM.createRoot(document.getElementById('root')).render(
   </BrowserRouter>
 
 );
+
+/*
+We are wrapping the App component in the PersistGate to ensure that the App does not load until 
+the data fetch/reception is completed between the application and the browser storage by passing 
+the persistor object it that we created earlier. I have set the loading value to null, 
+but you can use this to implement loading screens/components before data is properly loaded into Redux from storage.
+*/
