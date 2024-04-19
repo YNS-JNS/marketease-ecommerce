@@ -12,12 +12,10 @@ jest.mock('../models/listing.model.js', () => ({
 
 describe('Product Controller Tests', () => {
 
-
     /**
     * @testcase {getListings}
     */
     describe('get All Listing', () => {
-
         /**
         * @test {should return all products}
         */
@@ -43,7 +41,7 @@ describe('Product Controller Tests', () => {
             ListingModel.find.mockResolvedValueOnce(listings);
 
             // await listingController.getListings(req, res, next);
-            await listingController.getListings(req, res, next);
+            await listingController.getAllListings(req, res, next);
 
             expect(ListingModel.find).toHaveBeenCalled();
             expect(res.status).toHaveBeenCalledWith(200);
@@ -52,7 +50,7 @@ describe('Product Controller Tests', () => {
     });
 
     /**
-    * @testcase {getProductById}
+    * @testcase {getListing}
     */
     describe('get a Listing By Id', () => {
 
@@ -91,31 +89,28 @@ describe('Product Controller Tests', () => {
             expect(res.json).toHaveBeenCalledWith(listingData);
         });
 
-        //     /**
-        //     * @test {should return error if ID is not valid}
-        //     */
-        //     test('should return error if ID is not valid', async () => {
-        //         const req = {
-        //             body: {
-        //                 name: 'Test Product',
-        //                 price: 10,
-        //                 category: 'Test Category'
-        //             },
-        //             params: { id: '5f77777777777777777777k' }
-        //         };
-        //         const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+        /**
+        * @test {should return error if ID is not valid}
+        */
+        // test('should return error if ID is not valid', async () => {
+        //     const req = {
+        //         body: {
+        //             name: 'Test Product 2', description: 'desc test test', address: 'Test Category', regularPrice: 10,
+        //             discountPrice: 10, bathrooms: 10, bedrooms: 10, furnished: true, parking: true, type: 'Test Category', offer: true, imageUrls: 'Test Category', userRef: 'Test Category'
+        //         },
+        //         params: { id: '5f77777777777777777777k' }
+        //     };
+        //     const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
 
-        //         await productController.getProductById(req, res);
+        //     await listingController.getListing(req, res);
 
-        //         // Ensure ProductModel.findByIdAndUpdate is not called
-        //         expect(ProductModel.findById).not.toHaveBeenCalledWith();
+        //     expect(ListingModel.findById).not.toHaveBeenCalledWith();
 
-        //         expect(res.status).toHaveBeenCalledWith(400);
-        //         expect(res.json).toHaveBeenCalledWith({
-        //             status: 400,
-        //             message: `Product Id = ${req.params.id} is invalid !`
-        //         });
+        //     expect(res.status).toHaveBeenCalledWith(400);
+        //     expect(res.json).toHaveBeenCalledWith({
+        //         error: 'Listing not found!'
         //     });
+        // });
 
         //     /**
         //     * @test {should return error if product is not found}
@@ -172,6 +167,155 @@ describe('Product Controller Tests', () => {
         //         expect(res.status).toHaveBeenCalledWith(500);
         //         expect(res.json).toHaveBeenCalledWith({ error: 'Internal server error' });
         //     });
+        
+        /**
+        * @test {should return an error if listing is not found}
+        */
+         test('should return an error if listing is not found', async () => {
+            const req = { params: { id: 'listing_id' } };
+            const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+            const next = jest.fn();
+
+            ListingModel.findById.mockResolvedValueOnce(null);
+
+            await listingController.getListing(req, res, next);
+
+            expect(next).toHaveBeenCalledWith({ statusCode: 404, message: 'Listing not found!' });
+        });
+    });
+
+    /**
+    * @testcase {createListing}
+    */
+    describe('create Listing', () => {
+
+        /**
+            * @testcase {should create a new listing}
+        */
+        test('should create a new listing', async () => {
+            const req = {
+                body: {
+                    name: 'Test Product 2', description: 'desc test test', address: 'Test Category', regularPrice: 10,
+                    discountPrice: 10, bathrooms: 10, bedrooms: 10, furnished: true, parking: true, type: 'Test Category', offer: true, imageUrls: 'Test Category', userRef: 'Test Category'
+                }
+            };
+            const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+
+            ListingModel.create.mockResolvedValueOnce(req.body);
+
+            await listingController.createListing(req, res);
+
+            expect(ListingModel.create).toHaveBeenCalledWith(req.body);
+            expect(res.status).toHaveBeenCalledWith(201);
+            expect(res.json).toHaveBeenCalledWith(req.body);
+        });
+    })
+
+    /**
+    * @testcase {deleteListing}
+    */
+    describe('Delete Listing', () => {
+
+        /**
+        * @test {should delete a listing by its ID}
+        */
+        test('should delete a listing by its ID', async () => {
+            const req = { params: { id: 'listing_id' } };
+            const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+            const next = jest.fn();
+
+            ListingModel.findById.mockResolvedValueOnce({ userRef: 'user_id' });
+
+            await listingController.deleteListing(req, res, next);
+
+            expect(ListingModel.findByIdAndDelete).toHaveBeenCalledWith('listing_id');
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.json).toHaveBeenCalledWith('Listing has been deleted!');
+        });
+
+        /**
+        * @test {should return an error if listing is not found}
+        */
+        test('should return an error if listing is not found', async () => {
+            const req = { params: { id: 'listing_id' } };
+            const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+            const next = jest.fn();
+
+            ListingModel.findById.mockResolvedValueOnce(null);
+
+            await listingController.deleteListing(req, res, next);
+
+            expect(next).toHaveBeenCalledWith({ statusCode: 404, message: 'Listing not found!' });
+        });
+
+        /**
+        * @test {should return an error if user is not authorized to delete the listing}
+        */
+        test('should return an error if user is not authorized to delete the listing', async () => {
+            const req = { params: { id: 'listing_id' }, user: { id: 'another_user_id' } };
+            const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+            const next = jest.fn();
+
+            ListingModel.findById.mockResolvedValueOnce({ userRef: 'user_id' });
+
+            await listingController.deleteListing(req, res, next);
+
+            expect(next).toHaveBeenCalledWith({ statusCode: 401, message: 'You can only delete your own listings!' });
+        });
+    });
+
+    /**
+    * @testcase {updateListing}
+    */
+     describe('Update Listing', () => {
+
+        /**
+        * @test {should update a listing by its ID}
+        */
+        test('should update a listing by its ID', async () => {
+            const req = { params: { id: 'listing_id' }, body: { name: 'Updated Product' } };
+            const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+            const next = jest.fn();
+
+            ListingModel.findById.mockResolvedValueOnce({ userRef: 'user_id' });
+            ListingModel.findByIdAndUpdate.mockResolvedValueOnce({ _id: 'listing_id', ...req.body });
+
+            await listingController.updateListing(req, res, next);
+
+            expect(ListingModel.findByIdAndUpdate).toHaveBeenCalledWith('listing_id', req.body, { new: true });
+            expect(res.status).toHaveBeenCalledWith(200);
+            expect(res.json).toHaveBeenCalledWith({ _id: 'listing_id', ...req.body });
+        });
+
+        /**
+        * @test {should return an error if listing is not found}
+        */
+        test('should return an error if listing is not found', async () => {
+            const req = { params: { id: 'listing_id' }, body: { name: 'Updated Product' } };
+            const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+            const next = jest.fn();
+
+            ListingModel.findById.mockResolvedValueOnce(null);
+
+            await listingController.updateListing(req, res, next);
+
+            expect(next).toHaveBeenCalledWith({ statusCode: 404, message: 'Listing not found!' });
+        });
+
+        /**
+        * @test {should return an error if user is not authorized to update the listing}
+        */
+        test('should return an error if user is not authorized to update the listing', async () => {
+            const req = { params: { id: 'listing_id' }, body: { name: 'Updated Product' }, user: { id: 'another_user_id' } };
+            const res = { status: jest.fn().mockReturnThis(), json: jest.fn() };
+            const next = jest.fn();
+
+            ListingModel.findById.mockResolvedValueOnce({ userRef: 'user_id' });
+
+            await listingController.updateListing(req, res, next);
+
+            expect(next).toHaveBeenCalledWith({ statusCode: 401, message: 'You can only update your own listings!' });
+        });
     });
 
 });
