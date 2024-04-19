@@ -147,13 +147,13 @@ export const getListings = async (req, res, next) => {
   }
 };
 
-// export const getListings = async (req, res, next) => {
-//   try {
-//     const listings = await Listing.find({})
+export const getAllListings = async (req, res, next) => {
+  try {
+    const listings = await Listing.find({})
 
-//     return res.status(200).json(listings);
-//   } catch (error) {
-//     // res.status(500).json({ error: error.message });
-//     next(error);
-//   }
-// };
+    return res.status(200).json(listings);
+  } catch (error) {
+    // res.status(500).json({ error: error.message });
+    next(error);
+  }
+};
